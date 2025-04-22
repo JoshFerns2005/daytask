@@ -27,7 +27,7 @@ class _TaskDetailsContentState extends State<_TaskDetailsContent> {
   late TextEditingController _titleController;
   late TextEditingController _detailsController;
   late TextEditingController _subtaskController;
-
+  late List<TextEditingController> _subtaskControllers;
   @override
   void initState() {
     super.initState();
@@ -35,15 +35,36 @@ class _TaskDetailsContentState extends State<_TaskDetailsContent> {
     _titleController = TextEditingController();
     _detailsController = TextEditingController();
     _subtaskController = TextEditingController();
+    final taskProvider = Provider.of<TaskProvider>(context, listen: false);
+    _subtaskControllers = taskProvider.subtasks.map((subtask) {
+      return TextEditingController(text: subtask['title']);
+    }).toList();
   }
 
   @override
   void dispose() {
-    // Dispose of all controllers to avoid memory leaks
+    // Dispose of all controllers
     _titleController.dispose();
     _detailsController.dispose();
     _subtaskController.dispose();
+    for (final controller in _subtaskControllers) {
+      controller.dispose();
+    }
+
     super.dispose();
+  }
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+
+    // Synchronize subtask controllers with the TaskProvider's subtasks
+    final taskProvider = Provider.of<TaskProvider>(context, listen: false);
+    if (_subtaskControllers.length != taskProvider.subtasks.length) {
+      _subtaskControllers = taskProvider.subtasks.map((subtask) {
+        return TextEditingController(text: subtask['title']);
+      }).toList();
+    }
   }
 
   Future<void> _selectDate(
@@ -61,7 +82,15 @@ class _TaskDetailsContentState extends State<_TaskDetailsContent> {
 
   void _addSubtask(TaskProvider taskProvider) {
     if (_subtaskController.text.trim().isEmpty) return;
+
+    // Add the new subtask to the provider
     taskProvider.addSubtask(_subtaskController.text);
+
+    // Create a new controller for the subtask and add it to the list
+    _subtaskControllers
+        .add(TextEditingController(text: _subtaskController.text));
+
+    // Clear the input field
     _subtaskController.clear();
   }
 
@@ -451,16 +480,14 @@ class _TaskDetailsContentState extends State<_TaskDetailsContent> {
                   ...List.generate(taskProvider.subtasks.length, (index) {
                     final subtask = taskProvider.subtasks[index];
                     return Container(
-                      margin: EdgeInsets.only(
-                          bottom: basePadding / 2), // Responsive margin
+                      margin: EdgeInsets.only(bottom: basePadding / 2),
                       padding: EdgeInsets.symmetric(
-                        horizontal: basePadding / 2, // Responsive padding
-                        vertical: basePadding / 4, // Responsive padding
+                        horizontal: basePadding / 2,
+                        vertical: basePadding / 4,
                       ),
                       decoration: BoxDecoration(
-                        color: Theme.of(context).cardColor, // Dynamic color
-                        borderRadius: BorderRadius.circular(
-                            borderRadius), // Responsive border radius
+                        color: Theme.of(context).cardColor,
+                        borderRadius: BorderRadius.circular(borderRadius),
                       ),
                       child: Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -468,15 +495,14 @@ class _TaskDetailsContentState extends State<_TaskDetailsContent> {
                           if (taskProvider.isEditing)
                             Expanded(
                               child: TextField(
-                                controller: TextEditingController(
-                                    text: subtask['title']),
+                                controller: _subtaskControllers[
+                                    index], // Use the correct controller
                                 style: TextStyle(
                                   color: Theme.of(context)
                                       .textTheme
                                       .bodySmall
-                                      ?.color, // Dynamic color
-                                  fontSize:
-                                      fontSizeSmall, // Responsive font size
+                                      ?.color,
+                                  fontSize: fontSizeSmall,
                                 ),
                                 onChanged: (value) => taskProvider
                                     .updateSubtaskTitle(index, value),
@@ -492,8 +518,8 @@ class _TaskDetailsContentState extends State<_TaskDetailsContent> {
                                 color: Theme.of(context)
                                     .textTheme
                                     .bodySmall
-                                    ?.color, // Dynamic color
-                                fontSize: fontSizeSmall, // Responsive font size
+                                    ?.color,
+                                fontSize: fontSizeSmall,
                               ),
                             ),
                           Row(
@@ -502,18 +528,21 @@ class _TaskDetailsContentState extends State<_TaskDetailsContent> {
                                 value: subtask['is_completed'] ?? false,
                                 onChanged: (isChecked) => taskProvider
                                     .toggleSubtaskCompletion(index, isChecked),
-                                activeColor: Theme.of(context)
-                                    .colorScheme
-                                    .secondary, // Dynamic color
-                                checkColor: Theme.of(context)
-                                    .iconTheme
-                                    .color, // Dynamic color
+                                activeColor:
+                                    Theme.of(context).colorScheme.secondary,
+                                checkColor: Theme.of(context).iconTheme.color,
                               ),
                               if (taskProvider.isEditing)
                                 IconButton(
                                   icon: Icon(Icons.delete, color: Colors.red),
-                                  onPressed: () =>
-                                      taskProvider.removeSubtask(index),
+                                  onPressed: () {
+                                    // Remove the subtask from the provider
+                                    taskProvider.removeSubtask(index);
+
+                                    // Dispose of and remove the corresponding controller
+                                    _subtaskControllers[index].dispose();
+                                    _subtaskControllers.removeAt(index);
+                                  },
                                 ),
                             ],
                           ),

@@ -284,9 +284,7 @@ class _CreateTaskContentState extends State<_CreateTaskContent> {
                                         .bodyMedium
                                         ?.color),
                               ),
-                              backgroundColor: Theme.of(context)
-                                  .snackBarTheme
-                                  .backgroundColor,
+                              backgroundColor: Color(0xFF4CAF50),
                             ),
                           );
 

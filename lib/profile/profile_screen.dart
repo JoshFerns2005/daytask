@@ -1,3 +1,4 @@
+import 'package:daytask/auth/login_screen.dart';
 import 'package:daytask/profile/settings_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -46,7 +47,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
   Future<void> _logout() async {
     await supabase.auth.signOut();
     if (context.mounted) {
-      Navigator.pushReplacementNamed(context, '/login');
+      Navigator.pushReplacement(context, MaterialPageRoute(builder: (context)=> const LoginScreen()));
     }
   }
 
