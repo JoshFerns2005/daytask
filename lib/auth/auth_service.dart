@@ -52,14 +52,7 @@ class AuthService {
     return response;
   }
 
-  /// Sign in with Google
-  Future<void> signInWithGoogle() async {
-    await _client.auth.signInWithOAuth(
-      OAuthProvider.google,
-      redirectTo:
-          'https://arzeuzhyjmthudgpgozn.supabase.co/auth/v1/callback', // Update this to match your deep link
-    );
-  }
+  
 
   /// Sign out
   Future<void> signOut() async {

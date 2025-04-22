@@ -285,41 +285,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
               const SizedBox(height: 16),
 
               // Google Button
-              SizedBox(
-                width: double.infinity,
-                child: OutlinedButton.icon(
-                  onPressed: () async {
-                    try {
-                      await AuthService().signInWithGoogle();
-
-                      // Navigate to login after Google flow
-                      Navigator.pushReplacement(
-                        context,
-                        MaterialPageRoute(
-                            builder: (context) => const LoginScreen()),
-                      );
-                    } catch (e) {
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        SnackBar(content: Text(e.toString())),
-                      );
-                    }
-                  },
-                  icon: const Icon(Icons.g_mobiledata_outlined,
-                      color: Colors.white, size: 28),
-                  label: const Text(
-                    'Google',
-                    style: TextStyle(color: Colors.white, fontSize: 16),
-                  ),
-                  style: OutlinedButton.styleFrom(
-                    side: const BorderSide(color: Colors.white),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(0),
-                    ),
-                    padding: const EdgeInsets.symmetric(vertical: 16),
-                  ),
-                ),
-              ),
-              const SizedBox(height: 24),
+            
 
               // Already have account?
               Row(

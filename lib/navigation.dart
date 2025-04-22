@@ -2,7 +2,6 @@ import 'package:daytask/dashboard/dashboard_screen.dart';
 import 'package:daytask/profile/profile_screen.dart';
 import 'package:daytask/task/add_task.dart';
 import 'package:flutter/material.dart';
-// import other screens like CalendarScreen, AlertsScreen, ProfileScreen if needed
 
 class MainNavigation extends StatefulWidget {
   const MainNavigation({super.key});
@@ -16,47 +15,64 @@ class _MainNavigationState extends State<MainNavigation> {
 
   final List<Widget> _screens = [
     const DashboardScreen(),
-    const Center(
-        child: Text("Calendar", style: TextStyle(color: Colors.white))),
     const CreateTaskScreen(),
-    const Center(child: Text("Alerts", style: TextStyle(color: Colors.white))),
     const ProfileScreen(),
   ];
 
   @override
   Widget build(BuildContext context) {
+    // Get screen dimensions
+    final screenWidth = MediaQuery.of(context).size.width;
+    final screenHeight = MediaQuery.of(context).size.height;
+
+    // Define base values for responsiveness
+    final double basePadding = screenWidth * 0.04; // 4% of screen width
+    final double iconSize = screenWidth * 0.06; // 6% of screen width
+    final double containerHeight = screenHeight * 0.05; // 5% of screen height
+    final double borderRadius = screenWidth * 0.02; // 2% of screen width
+
     return Scaffold(
       body: _screens[_currentIndex],
       bottomNavigationBar: BottomNavigationBar(
         currentIndex: _currentIndex,
         type: BottomNavigationBarType.fixed,
-        selectedItemColor: Color(0xFFFED36A),
-        unselectedItemColor: Colors.grey,
-        backgroundColor: const Color(0xFF263238),
+        selectedItemColor: Color(0xFFFED36A), // Dynamic color
+        unselectedItemColor: Theme.of(context).textTheme.bodySmall?.color, // Dynamic color
+        backgroundColor: Theme.of(context).bottomNavigationBarTheme.backgroundColor, // Dynamic color
         onTap: (index) {
           setState(() => _currentIndex = index);
         },
         items: [
-          BottomNavigationBarItem(icon: Icon(Icons.home_outlined), label: "Home"),
-          BottomNavigationBarItem(icon: Icon(Icons.calendar_month), label: "Calendar"),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.home_outlined, size: iconSize),
+            label: "Home",
+          ),
           BottomNavigationBarItem(
             icon: Padding(
-              padding: EdgeInsets.fromLTRB(0,12,0,6), // Adjust padding here for alignment
+              padding: EdgeInsets.fromLTRB(0, basePadding, 0, basePadding / 2), // Responsive padding
               child: Container(
-                padding: EdgeInsets.symmetric(horizontal: 12, vertical: 12),
-                decoration: BoxDecoration(
-                  color: Color(0xFFFED36A),
-                  borderRadius: BorderRadius.circular(0),
+                height: containerHeight, // Responsive height
+                padding: EdgeInsets.symmetric(
+                  horizontal: basePadding * 1.5, // Responsive horizontal padding
+                  vertical: basePadding / 2, // Responsive vertical padding
                 ),
-                child: Icon(Icons.add_box_outlined, color: Colors.black),
+                decoration: BoxDecoration(
+                  color: Color(0xFFFED36A), // Dynamic color
+                  borderRadius: BorderRadius.circular(borderRadius), // Responsive border radius
+                ),
+                child: Icon(
+                  Icons.add_box_outlined,
+                  size: iconSize, // Responsive icon size
+                  color: Theme.of(context).iconTheme.color, // Dynamic color
+                ),
               ),
             ),
             label: "",
           ),
           BottomNavigationBarItem(
-              icon: Icon(Icons.notifications_none_rounded), label: "Alerts"),
-          BottomNavigationBarItem(
-              icon: Icon(Icons.person_outline_rounded), label: "Profile"),
+            icon: Icon(Icons.person_outline_rounded, size: iconSize),
+            label: "Profile",
+          ),
         ],
       ),
     );

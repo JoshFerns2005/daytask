@@ -1,4 +1,5 @@
 import 'package:daytask/auth/login_screen.dart';
+import 'package:daytask/navigation.dart';
 import 'package:flutter/material.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
@@ -62,8 +63,26 @@ class SplashScreen extends StatelessWidget {
                   final user = Supabase.instance.client.auth.currentUser;
 
                   if (user != null) {
-                    // Navigate to dashboard
-                    Navigator.pushReplacementNamed(context, '/navigation');
+                    // Navigate to dashboard with slide transition
+                    Navigator.pushReplacement(
+                      context,
+                      PageRouteBuilder(
+                        pageBuilder: (_, __, ___) => const MainNavigation(),
+                        transitionsBuilder: (_, animation, __, child) {
+                          return SlideTransition(
+                            position: Tween<Offset>(
+                              begin: const Offset(1, 0), // Slide from right
+                              end: Offset.zero, // End at the center
+                            ).animate(CurvedAnimation(
+                              parent: animation,
+                              curve: Curves.easeInOut,
+                            )),
+                            child: child,
+                          );
+                        },
+                        transitionDuration: const Duration(milliseconds: 500),
+                      ),
+                    );
                   } else {
                     // Navigate to login
                     Navigator.pushReplacement(
