@@ -49,12 +49,11 @@ lib/
 ```
 ## Getting Started
 1. Clone the Repository
-bash
-Copy
-Edit
+```
 git clone https://github.com/your-username/daytask.git
 cd daytask
-2. Set Up Flutter Project
+```
+3. Set Up Flutter Project
 If you haven’t created a Flutter project yet:
 
 Press Ctrl + Shift + P in VS Code
